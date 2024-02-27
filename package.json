@@ -8,7 +8,8 @@
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "ios": "expo run:ios",
     "start": "expo start --dev-client",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "supabase:gen-types": "supabase gen types typescript --linked > src/types/__generated__/supabase.d.ts"
   },
   "dependencies": {
     "@babel/runtime": "^7.23.9",

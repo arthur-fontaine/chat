@@ -62,4 +62,7 @@ export default antfu(
       'import/no-default-export': 'off',
     },
   },
+  {
+    ignores: ['**/__generated__/**'],
+  },
 )
