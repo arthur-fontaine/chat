@@ -4,7 +4,7 @@ import { TextInput, View } from 'react-native'
 import { createStyleSheet, useStyles } from 'react-native-unistyles'
 
 interface InputProps
-  extends Pick<TextInput['props'], 'autoCapitalize' | 'placeholder' | 'secureTextEntry'> {
+  extends Pick<TextInput['props'], 'autoCapitalize' | 'inputMode' | 'placeholder' | 'secureTextEntry' | 'textContentType'> {
   onChangeValue?: (value: string) => void
   style?: View['props']['style']
 }

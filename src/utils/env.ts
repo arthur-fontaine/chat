@@ -1,4 +1,4 @@
-import process from 'node:process'
+/* eslint-disable node/prefer-global/process */
 
 export const supabaseUrl = getEnvVar('EXPO_PUBLIC_SUPABASE_URL')
 export const supabaseAnonKey = getEnvVar('EXPO_PUBLIC_SUPABASE_ANON_KEY')
