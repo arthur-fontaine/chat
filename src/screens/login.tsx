@@ -7,7 +7,7 @@ import { useError } from '~/hooks/use-error'
 import { DefaultLayout } from '~/layout/default-layout'
 import { supabase } from '~/utils/supabase'
 
-export function Login() {
+export function LoginScreen() {
   const { styles } = useStyles(stylesheet)
 
   const { authenticate, disabled, setEmail, setPassword } = useLoginController()
@@ -57,12 +57,12 @@ const stylesheet = createStyleSheet(theme => ({
   loginContainer: {
     alignItems: 'stretch',
     flex: 1,
-    gap: theme.spacings.xl,
+    gap: theme.spacings.large,
     justifyContent: 'center',
   },
   passwordContainer: {
     flexDirection: 'row',
-    gap: theme.spacings.lg,
+    gap: theme.spacings.normal,
     width: '100%',
   },
 }))

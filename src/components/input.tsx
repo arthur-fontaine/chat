@@ -56,13 +56,13 @@ const stylesheet = createStyleSheet(theme => ({
   input: {
     color: theme.colors.text,
     height: '100%',
-    paddingHorizontal: theme.spacings.xl,
+    paddingHorizontal: theme.spacings.large,
   },
   inputContainer: {
     backgroundColor: theme.colors.backgroundSubtle,
     borderRadius: theme.radii.full,
     flex: 1,
-    maxHeight: theme.heights.lg,
+    maxHeight: theme.heights.input,
   },
   placeholder: {
     opacity: theme.opacities.subtle,

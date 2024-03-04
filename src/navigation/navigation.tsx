@@ -4,9 +4,9 @@ import { createStackNavigator } from '@react-navigation/stack'
 
 import { useEffect, useRef } from 'react'
 import { InteractionManager } from 'react-native'
-import { Login } from '../screens/login'
+import { LoginScreen } from '../screens/login'
 import { supabase } from '~/utils/supabase'
-import { Messages } from '~/screens/messages'
+import { MessagesScreen } from '~/screens/messages/messages'
 import { useSplashScreen } from '~/hooks/use-splash-screen'
 import { createDeferredPromise } from '~/utils/deferred-promise'
 
@@ -30,8 +30,8 @@ export function RootStack() {
           headerShown: false,
         }}
       >
-        <Stack.Screen component={Messages} name="Home" />
-        <Stack.Screen component={Login} name="Login" />
+        <Stack.Screen component={MessagesScreen} name="Home" />
+        <Stack.Screen component={LoginScreen} name="Login" />
       </Stack.Navigator>
     </NavigationContainer>
   )

@@ -47,7 +47,7 @@ const stylesheet = createStyleSheet(theme => ({
     borderRadius: theme.radii.full,
     color: theme.colors.text,
     flexDirection: 'row',
-    height: theme.heights.lg,
+    height: theme.heights.input,
     justifyContent: 'center',
   },
   disabled: {

@@ -7,21 +7,25 @@ const colors = {
 
 export const lightTheme = {
   colors,
+  fontSizes: {
+    normal: 18,
+    small: 12,
+  },
   heights: {
-    lg: 48,
-    md: 40,
-    sm: 32,
+    input: 48,
   },
   opacities: {
     subtle: 0.7,
   },
   radii: {
     full: 9999,
+    normal: 20,
   },
   spacings: {
-    lg: 12,
-    md: 4,
-    sm: 2,
-    xl: 16,
+    large: 16,
+    normal: 12,
+    small: 8,
+    xlarge: 20,
+    xsmall: 2,
   },
 } as const
