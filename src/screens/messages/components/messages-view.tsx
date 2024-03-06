@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef } from 'react'
-import { FlatList } from 'react-native'
+import { FlatList, View } from 'react-native'
 import { createStyleSheet, useStyles } from 'react-native-unistyles'
 import { MessageBubble } from './message-bubble'
 import { MessagesDate } from './messages-date'
@@ -13,20 +13,20 @@ export const MessagesView = React.memo(({
 }: {
   onFirstViewableDateChange: (date: Date) => void
 }) => {
-  const { styles } = useStyles(stylesheet)
-
   const { messages } = useMessages()
   const { conversation } = useConversation()
 
   const messagesWithDateHeaders = useMessagesWithDateHeaders(messages)
-  const renderMessageBubble = useRenderMessageBubble(conversation)
+  const renderMessageBubble = useRenderMessageBubble({
+    conversation,
+    messagesWithDateHeaders,
+  })
   const { handleViewableItemsChanged } = useDateHeaderController({
     onFirstViewableDateChange,
   })
 
   return (
     <FlatList
-      contentContainerStyle={styles.messagesContainer}
       data={messagesWithDateHeaders}
       inverted
       keyExtractor={item => item.id}
@@ -34,7 +34,6 @@ export const MessagesView = React.memo(({
       renderItem={renderMessageBubble}
       scrollEnabled
       showsVerticalScrollIndicator={false}
-      style={{ flex: 1 }}
       viewabilityConfig={{
         itemVisiblePercentThreshold: 0,
       }}
@@ -81,25 +80,47 @@ function useMessagesWithDateHeaders(messages: Message[]) {
   return messagesWithDateHeaders
 }
 
-function useRenderMessageBubble(conversation: Conversation) {
+function useRenderMessageBubble({ conversation, messagesWithDateHeaders }: {
+  conversation: Conversation
+  messagesWithDateHeaders: ReturnType<typeof useMessagesWithDateHeaders>
+}) {
+  const { styles } = useStyles(stylesheet)
+
+  const firstIndex = useMemo(() => messagesWithDateHeaders.length - 1, [
+    messagesWithDateHeaders,
+  ]) // The first index is the last message because the list is inverted
+
   const renderItem = useCallback(
-    ({ item }: {
-      item: ReturnType<typeof useMessagesWithDateHeaders>[number]
+    ({ index, item }: {
+      index: number
+      item: typeof messagesWithDateHeaders[number]
     }) => {
       if (item.type === 'header') {
         return (
-          <MessagesDate date={item.date} />
+          <View style={[
+            styles.messageContainer,
+            index === firstIndex && styles.firstMessageContainer,
+          ]}
+          >
+            <MessagesDate date={item.date} />
+          </View>
         )
       }
 
       return (
-        <MessageBubble
-          conversation={conversation}
-          message={item}
-        />
+        <View style={[
+          styles.messageContainer,
+          index === firstIndex && styles.firstMessageContainer,
+        ]}
+        >
+          <MessageBubble
+            conversation={conversation}
+            message={item}
+          />
+        </View>
       )
     },
-    [conversation],
+    [conversation, styles],
   )
 
   return renderItem
@@ -136,8 +157,10 @@ function useDateHeaderController({
 }
 
 const stylesheet = createStyleSheet(theme => ({
-  messagesContainer: {
-    gap: theme.spacings.large,
-    paddingVertical: theme.spacings.large,
+  firstMessageContainer: {
+    marginTop: theme.spacings.large,
+  },
+  messageContainer: {
+    marginBottom: theme.spacings.large,
   },
 }))
