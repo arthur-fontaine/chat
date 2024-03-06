@@ -25,6 +25,7 @@ export function DefaultLayout({
           </ScrollView>
         ) : <View style={{ flex: 1 }}>{children}</View>
       }
+      <View style={{ height: safeAreaInsets.bottom }} />
     </View>
   )
 }
