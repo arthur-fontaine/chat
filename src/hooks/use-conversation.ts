@@ -9,7 +9,7 @@ export function useConversation(): { conversation: Conversation } {
           avatar: 'https://randomuser.me/api/portraits',
           color: '#454ADE',
           colorGradient: ['#454ADE', '#4045DD'] as [string, string],
-          id: '1',
+          id: '6e70c108-4fe9-43df-857a-388575306df1',
           isMe: true,
           name: 'Arthur',
         },

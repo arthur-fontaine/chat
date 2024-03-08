@@ -29,7 +29,7 @@ export const MessagesView = React.memo(({
     <FlatList
       data={messagesWithDateHeaders}
       inverted
-      keyExtractor={item => item.id}
+      keyExtractor={item => item.id.toString()}
       onViewableItemsChanged={handleViewableItemsChanged}
       renderItem={renderMessageBubble}
       scrollEnabled
@@ -45,7 +45,7 @@ function useMessagesWithDateHeaders(messages: Message[]) {
   const messagesWithDateHeaders = useMemo(() => {
     const messagesWithDateHeaders = messages
       .reduce<(
-        { date: Date, id: string, type: 'header' } |
+        { date: Date, id: number, type: 'header' } |
         Message & { type: 'message' }
     )[]>((acc, message, index) => {
         const previousMessage = messages[index - 1]
@@ -67,7 +67,7 @@ function useMessagesWithDateHeaders(messages: Message[]) {
           },
           ...(showDate ? [{
             date: messageDate,
-            id: `header-${messageDate.getTime()}`,
+            id: messageDate.getTime(),
             type: 'header' as const,
           }] : []),
           ...acc,

@@ -12,3 +12,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     storage: AsyncStorage,
   },
 })
+
+// eslint-disable-next-line ts/no-redeclare
+export type supabase = typeof supabase & {
+  tables: Database['public']['Tables']
+}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import * as SplashScreen from 'expo-splash-screen'
 import { InteractionManager } from 'react-native'
+import { allTasks } from 'nanostores'
 
 export function useSplashScreen() {
   const [promises, setPromises] = useState<(Promise<boolean>)[]>([])
@@ -17,8 +18,10 @@ export function useSplashScreen() {
       return
     }
 
-    Promise.all(promises).then((results) => {
+    Promise.all(promises).then(async (results) => {
       if (results.every(Boolean)) {
+        await allTasks()
+
         SplashScreen.hideAsync()
       }
     })

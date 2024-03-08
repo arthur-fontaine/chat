@@ -4,10 +4,11 @@
  */
 module.exports = function (api) {
   api.cache(true)
-  const plugins = []
 
   return {
-    plugins,
+    plugins: [
+      ['inline-import', { extensions: ['.sql'] }],
+    ],
 
     presets: ['babel-preset-expo'],
   }

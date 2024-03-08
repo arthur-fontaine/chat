@@ -5,10 +5,10 @@ import { createStackNavigator } from '@react-navigation/stack'
 import { useEffect, useRef } from 'react'
 import { InteractionManager } from 'react-native'
 import { LoginScreen } from '../screens/login'
-import { supabase } from '~/utils/supabase'
 import { MessagesScreen } from '~/screens/messages/messages'
 import { useSplashScreen } from '~/hooks/use-splash-screen'
 import { createDeferredPromise } from '~/utils/deferred-promise'
+import { useAuth } from '~/hooks/use-auth'
 
 // eslint-disable-next-line ts/consistent-type-definitions
 export type RootStackParamList = {
@@ -45,6 +45,7 @@ function useAuthScreenController(
   navigationRef: ReturnType<typeof useNavigationRef>,
 ) {
   const { current: deferredPromise } = useRef(createDeferredPromise<boolean>())
+  const { authenticated, isReady } = useAuth()
 
   const { hideSplashScreenUntil } = useSplashScreen()
   useEffect(
@@ -52,17 +53,21 @@ function useAuthScreenController(
     [deferredPromise, hideSplashScreenUntil],
   )
 
-  supabase.auth.onAuthStateChange((_, session) => {
-    if (session === null) {
-      navigationRef.current?.navigate('Login')
+  useEffect(() => {
+    if (!isReady) {
+      return
+    }
+
+    if (authenticated) {
+      navigationRef.current?.navigate('Home')
     }
     else {
-      navigationRef.current?.navigate('Home')
+      navigationRef.current?.navigate('Login')
     }
 
     InteractionManager.runAfterInteractions(() => {
       // When transition is complete, resolve the promise
       deferredPromise.resolve(true)
     })
-  })
+  }, [authenticated, isReady, navigationRef])
 }
