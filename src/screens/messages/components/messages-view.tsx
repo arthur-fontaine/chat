@@ -3,9 +3,7 @@ import { FlatList, View } from 'react-native'
 import { createStyleSheet, useStyles } from 'react-native-unistyles'
 import { MessageBubble } from './message-bubble'
 import { MessagesDate } from './messages-date'
-import { useConversation } from '~/hooks/use-conversation'
 import { useMessages } from '~/hooks/use-messages'
-import type { Conversation } from '~/types/conversation'
 import type { Message } from '~/types/message'
 
 export const MessagesView = React.memo(({
@@ -14,11 +12,9 @@ export const MessagesView = React.memo(({
   onFirstViewableDateChange: (date: Date) => void
 }) => {
   const { messages } = useMessages()
-  const { conversation } = useConversation()
 
   const messagesWithDateHeaders = useMessagesWithDateHeaders(messages)
   const renderMessageBubble = useRenderMessageBubble({
-    conversation,
     messagesWithDateHeaders,
   })
   const { handleViewableItemsChanged } = useDateHeaderController({
@@ -80,8 +76,7 @@ function useMessagesWithDateHeaders(messages: Message[]) {
   return messagesWithDateHeaders
 }
 
-function useRenderMessageBubble({ conversation, messagesWithDateHeaders }: {
-  conversation: Conversation
+function useRenderMessageBubble({ messagesWithDateHeaders }: {
   messagesWithDateHeaders: ReturnType<typeof useMessagesWithDateHeaders>
 }) {
   const { styles } = useStyles(stylesheet)
@@ -113,14 +108,11 @@ function useRenderMessageBubble({ conversation, messagesWithDateHeaders }: {
           index === firstIndex && styles.firstMessageContainer,
         ]}
         >
-          <MessageBubble
-            conversation={conversation}
-            message={item}
-          />
+          <MessageBubble message={item} />
         </View>
       )
     },
-    [conversation, styles],
+    [styles],
   )
 
   return renderItem

@@ -24,5 +24,6 @@ export function useAuth() {
   return {
     authenticated,
     isReady,
+    userId: session?.user.id,
   }
 }

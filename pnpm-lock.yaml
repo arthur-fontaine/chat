@@ -29,6 +29,12 @@ dependencies:
   '@supabase/supabase-js':
     specifier: ^2.38.4
     version: 2.39.7
+  '@types/color-convert':
+    specifier: ^2.0.3
+    version: 2.0.3
+  color-convert:
+    specifier: ^2.0.1
+    version: 2.0.1
   drizzle-orm:
     specifier: ^0.29.4
     version: 0.29.4(@types/react@18.2.60)(expo-sqlite@13.3.0)(react@18.2.0)
@@ -3325,6 +3331,16 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+    dev: false
+
+  /@types/color-convert@2.0.3:
+    resolution: {integrity: sha512-2Q6wzrNiuEvYxVQqhh7sXM2mhIhvZR/Paq4FdsQkOMgWsCIkKvSGj8Le1/XalulrmgOzPMqNa0ix+ePY4hTrfg==}
+    dependencies:
+      '@types/color-name': 1.1.3
+    dev: false
+
+  /@types/color-name@1.1.3:
+    resolution: {integrity: sha512-87W6MJCKZYDhLAx/J1ikW8niMvmGRyY+rpUxWpL1cO7F8Uu5CHuQoFv+R0/L5pgNdW4jTyda42kv60uwVIPjLw==}
     dev: false
 
   /@types/eslint@8.56.3:

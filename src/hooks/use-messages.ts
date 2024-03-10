@@ -15,7 +15,7 @@ export function useMessages() {
   const { throwError } = useError()
 
   // Initialize the messages atom when the user is authenticated.
-  const { authenticated } = useAuth()
+  const { authenticated, userId } = useAuth()
   useEffect(() => {
     if (authenticated) {
       initializeMessages()
@@ -30,10 +30,20 @@ export function useMessages() {
   )
 
   const sendMessage_ = useCallback(
-    async (message: Parameters<typeof sendMessage>[0]) => {
-      await sendMessage(message, messages, { onError: throwError })
+    async (message: Pick<Message, 'text'>) => {
+      if (!userId) {
+        throwError(new Error('User is not authenticated'))
+        return
+      }
+
+      await sendMessage({
+        currentMessages: messages,
+        message,
+        onError: throwError,
+        userId,
+      })
     },
-    [messages, throwError],
+    [messages, throwError, userId],
   )
 
   return {
@@ -67,15 +77,24 @@ function initializeMessages() {
   })
 }
 
-async function sendMessage(
-  message: Omit<Message, 'id' | 'state'>,
-  currentMessages: Message[],
-  { onError }: { onError: (error: Error) => void },
-) {
-  const newMessage = {
+async function sendMessage({
+  currentMessages,
+  message,
+  onError,
+  userId,
+}: {
+  currentMessages: Message[]
+  message: Pick<Message, 'text'>
+  onError: (error: Error) => void
+  userId: string
+}) {
+  const newMessage: Message = {
     ...message,
+    color: undefined, // TODO: In the future, we may allow users to set their own color.
+    date: new Date(),
+    fromId: userId,
     id: Math.max(...currentMessages.map(message => message.id), 0) + 1,
-    state: 'sending' as const,
+    state: 'sending',
   }
   messagesAtom.set([...messagesAtom.get(), newMessage])
 
@@ -157,10 +176,23 @@ supabase.channel('messages')
   .on<SupabaseMessage>(
   'postgres_changes',
   { event: 'INSERT', schema: 'public', table: 'messages' },
-  payload => messagesAtom.set([
-    ...messagesAtom.get(),
-    supabaseMessageToMessage(payload.new),
-  ]),
+  (payload) => {
+    const messages = messagesAtom.get()
+    const newMessage = supabaseMessageToMessage(payload.new)
+
+    const messageIndex
+        = messages.findIndex(message => message.text === newMessage.text
+        && message.date.getTime() === newMessage.date.getTime())
+
+    if (messageIndex !== -1) {
+      // If the message already exists, update it.
+      messages[messageIndex] = newMessage
+      messagesAtom.set(messages)
+    }
+    else {
+      messagesAtom.set([...messages, newMessage])
+    }
+  },
 )
   // Listen to delete on the messages table.
   .on<SupabaseMessage>(
@@ -192,6 +224,7 @@ function supabaseMessageToMessage(
   supabaseMessage: supabase['tables']['messages']['Row'],
 ): Message {
   return {
+    color: supabaseMessage.color ? `#${supabaseMessage.color.toString(16)}` : null,
     date: new Date(supabaseMessage.created_at),
     fromId: supabaseMessage.sender,
     id: supabaseMessage.id,
@@ -204,6 +237,7 @@ function messageToSupabaseMessage(
   message: Message,
 ): supabase['tables']['messages']['Row'] {
   return {
+    color: message.color ? Number.parseInt(message.color.slice(1), 16) : null,
     created_at: message.date.toISOString(),
     id: message.id,
     message: message.text,

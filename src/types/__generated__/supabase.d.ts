@@ -69,6 +69,7 @@ export type Database = {
       }
       messages: {
         Row: {
+          color: number | null
           created_at: string
           id: number
           message: string | null
@@ -76,13 +77,15 @@ export type Database = {
           user_pair: number
         }
         Insert: {
+          color?: number | null
           created_at?: string
           id?: number
           message?: string | null
-          sender: string
+          sender?: string
           user_pair: number
         }
         Update: {
+          color?: number | null
           created_at?: string
           id?: number
           message?: string | null
@@ -102,6 +105,38 @@ export type Database = {
             columns: ["user_pair"]
             isOneToOne: false
             referencedRelation: "user_pairs"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          default_color: number
+          display_name: string
+          id: number
+          user: string
+        }
+        Insert: {
+          created_at?: string
+          default_color: number
+          display_name: string
+          id?: number
+          user: string
+        }
+        Update: {
+          created_at?: string
+          default_color?: number
+          display_name?: string
+          id?: number
+          user?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_profiles_user_fkey"
+            columns: ["user"]
+            isOneToOne: true
+            referencedRelation: "users"
             referencedColumns: ["id"]
           }
         ]

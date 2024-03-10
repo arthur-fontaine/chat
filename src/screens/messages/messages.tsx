@@ -3,6 +3,7 @@ import { createStyleSheet, useStyles } from 'react-native-unistyles'
 import { useState } from 'react'
 import { MessagesDate } from './components/messages-date'
 import { MessagesView } from './components/messages-view'
+import { NewMessageInput } from './components/new-message-input'
 import { DefaultLayout } from '~/layout/default-layout'
 
 export function MessagesScreen() {
@@ -20,7 +21,10 @@ export function MessagesScreen() {
           </View>
         )
       }
-      <MessagesView onFirstViewableDateChange={setFirstViewableDate} />
+      <View style={styles.messagesScreenContainer}>
+        <MessagesView onFirstViewableDateChange={setFirstViewableDate} />
+        <NewMessageInput />
+      </View>
     </DefaultLayout>
   )
 }
@@ -33,5 +37,8 @@ const stylesheet = createStyleSheet(_theme => ({
     top: 0,
     width: '100%',
     zIndex: 1,
+  },
+  messagesScreenContainer: {
+    flex: 1,
   },
 }))

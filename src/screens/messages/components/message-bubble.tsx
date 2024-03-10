@@ -4,30 +4,31 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { createStyleSheet, useStyles } from 'react-native-unistyles'
 import { useMemo } from 'react'
 import { format } from '@formkit/tempo'
+import colorConvert from 'color-convert'
 
 import type { Message } from '~/types/message'
-import type { Conversation } from '~/types/conversation'
 import { useError } from '~/hooks/use-error'
+import { useProfiles } from '~/hooks/use-profiles'
+import { useAuth } from '~/hooks/use-auth'
 
 interface MessageBubbleProps {
-  conversation: Conversation
   message: Message
 }
 
-export function MessageBubble({ conversation, message }: MessageBubbleProps) {
+export function MessageBubble({ message }: MessageBubbleProps) {
   const { styles, theme } = useStyles(stylesheet)
 
-  const augmentedMessage = useAugmentedMessage(conversation, message)
+  const augmentedMessage = useAugmentedMessage(message)
+
+  const formattedHour = useMemo(() =>
+    augmentedMessage && format({
+      date: augmentedMessage.date,
+      format: { time: 'short' },
+    }), [augmentedMessage])
 
   if (!augmentedMessage) {
     return null
   }
-
-  const formattedHour = useMemo(() =>
-    format({
-      date: message.date,
-      format: { time: 'short' },
-    }), [message.date])
 
   return (
     <View style={styles.messageContainer}>
@@ -42,14 +43,14 @@ export function MessageBubble({ conversation, message }: MessageBubbleProps) {
           style={[styles.backgroundOverlay, styles[`${augmentedMessage.position}BackgroundOverlay`]]}
         />
         <Text style={styles.text}>
-          {message.text}
+          {augmentedMessage.text}
         </Text>
         <View style={styles.footer}>
           <Text style={styles.hour}>
             {formattedHour}
           </Text>
           <View>
-            {message.state === 'sending' && (
+            {augmentedMessage.state === 'sending' && (
               <Feather
                 color={theme.colors.text}
                 name="clock"
@@ -57,7 +58,7 @@ export function MessageBubble({ conversation, message }: MessageBubbleProps) {
                 style={styles.icon}
               />
             )}
-            {message.state === 'received' && (
+            {augmentedMessage.state === 'received' && (
               <Feather
                 color={theme.colors.text}
                 name="check"
@@ -65,7 +66,7 @@ export function MessageBubble({ conversation, message }: MessageBubbleProps) {
                 style={styles.icon}
               />
             )}
-            {message.state === 'seen' && (
+            {augmentedMessage.state === 'seen' && (
               <View style={{ flexDirection: 'row', gap: -12 }}>
                 <Feather
                   color={augmentedMessage.color}
@@ -88,25 +89,42 @@ export function MessageBubble({ conversation, message }: MessageBubbleProps) {
   )
 }
 
-function useAugmentedMessage(conversation: Conversation, message: Message) {
+function useAugmentedMessage(message: Message) {
   const { throwError } = useError()
 
+  const { profiles } = useProfiles() // TODO: We may want to add a selector, to get only the profile of the message author.
+  const { userId } = useAuth()
+
   return useMemo(() => {
-    const participant = conversation.participants.find(
-      p => p.id === message.fromId,
+    const profile = profiles.find(
+      p => p.userId === message.fromId,
     )
 
-    if (!participant) {
-      throwError(new Error('Participant not found'))
+    if (!profile) {
+      throwError(new Error('Message author profile not found'))
       return
     }
 
     return {
       ...message,
-      ...participant,
-      position: participant.isMe ? 'right' as const : 'left' as const,
+      color: message.color ?? profile.color,
+      colorGradient: getColorGradient(profile.color),
+      position: message.fromId === userId ? 'right' as const : 'left' as const,
     }
-  }, [conversation, message])
+  }, [message, profiles, userId])
+}
+
+function getColorGradient(baseColor: string): [string, string] {
+  const secondColorHsl = colorConvert.hex.hsl(baseColor)
+  if (secondColorHsl[2] > 50) {
+    secondColorHsl[2] -= 1
+  }
+  else {
+    secondColorHsl[2] += 1
+  }
+  const secondColor = colorConvert.hsl.hex(secondColorHsl)
+
+  return [baseColor, `#${secondColor}`]
 }
 
 const stylesheet = createStyleSheet((theme) => {
